@@ -1,7 +1,7 @@
 // RuView Service Worker - Offline caching for the dashboard shell
 // Strategy: Network-first for API calls, Cache-first for static assets
 
-const CACHE_NAME = 'ruview-v3';
+const CACHE_NAME = 'ruview-v4';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
@@ -59,7 +59,9 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch - network-first for API, cache-first for static
+// Fetch - network-first for everything, cache only as offline fallback.
+// (Cache-first served stale UI after every update; localhost network cost
+// is negligible, so freshness wins.)
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -73,36 +75,8 @@ self.addEventListener('fetch', (event) => {
   // Skip cross-origin requests
   if (url.origin !== self.location.origin) return;
 
-  // API calls: network-first with cache fallback
-  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/health/')) {
-    event.respondWith(networkFirst(request));
-    return;
-  }
-
-  // Static assets: cache-first with network fallback
-  event.respondWith(cacheFirst(request));
+  event.respondWith(networkFirst(request));
 });
-
-async function cacheFirst(request) {
-  const cached = await caches.match(request);
-  if (cached) return cached;
-
-  try {
-    const response = await fetch(request);
-    if (response.ok) {
-      const cache = await caches.open(CACHE_NAME);
-      cache.put(request, response.clone());
-    }
-    return response;
-  } catch {
-    // Return offline fallback for HTML navigation
-    if (request.headers.get('Accept')?.includes('text/html')) {
-      const fallback = await caches.match('/index.html');
-      if (fallback) return fallback;
-    }
-    return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
-  }
-}
 
 async function networkFirst(request) {
   try {
@@ -115,6 +89,11 @@ async function networkFirst(request) {
   } catch {
     const cached = await caches.match(request);
     if (cached) return cached;
+    // Offline fallback for HTML navigation
+    if (request.headers.get('Accept')?.includes('text/html')) {
+      const fallback = await caches.match('/index.html');
+      if (fallback) return fallback;
+    }
     return new Response(JSON.stringify({ error: 'offline' }), {
       status: 503,
       headers: { 'Content-Type': 'application/json' }

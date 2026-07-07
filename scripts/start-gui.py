@@ -73,7 +73,9 @@ def start_sensing_server() -> subprocess.Popen | None:
 
 def serve_ui(port: int) -> http.server.ThreadingHTTPServer:
     handler = functools.partial(NoCacheHandler, directory=UI_DIR)
-    return http.server.ThreadingHTTPServer(("0.0.0.0", port), handler)
+    # Bind localhost only — the sensing WebSocket is localhost-only too,
+    # so a LAN-exposed UI would show no data anyway.
+    return http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
 
 
 def main() -> int:

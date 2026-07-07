@@ -285,7 +285,12 @@ export class DashboardTab {
       this.updateZonesDisplay(zonesSummary);
 
     } catch (error) {
-      console.error('Failed to update live stats:', error);
+      // Expected in sensing-only mode (no pose REST API) — log once, keep
+      // polling quietly so stats recover if the Rust server comes up later.
+      if (!this._statsErrorLogged) {
+        this._statsErrorLogged = true;
+        console.info('Dashboard: pose REST API unavailable — live stats paused (sensing-only mode)');
+      }
     }
   }
 

@@ -49,7 +49,10 @@ export class ModelService {
       this.logger.info('Listed models', { count: data?.models?.length ?? 0 });
       return data;
     } catch (error) {
-      this.logger.error('Failed to list models', { error: error.message });
+      // 404 = no model REST API (Python sensing-only mode) — expected, stay quiet
+      if (!(error.message || '').startsWith('HTTP 404')) {
+        this.logger.error('Failed to list models', { error: error.message });
+      }
       throw error;
     }
   }
@@ -96,7 +99,8 @@ export class ModelService {
       this.activeModel = data || null;
       return this.activeModel;
     } catch (error) {
-      if (error.status === 404) {
+      // apiService throws plain Errors (no .status) — detect 404 from the message too
+      if (error.status === 404 || (error.message || '').startsWith('HTTP 404')) {
         this.activeModel = null;
         return null;
       }

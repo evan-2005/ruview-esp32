@@ -119,14 +119,18 @@ export class LiveDemoTab {
       // Auto-start pose detection when a backend is reachable.
       // Check after a brief delay (sensing WS may still be connecting).
       this._autoStartOnce = false;
-      const tryAutoStart = () => {
+      const tryAutoStart = async () => {
         if (this._autoStartOnce || this.state.isActive) return;
         const ds = sensingService.dataSource;
-        if (ds === 'live' || ds === 'server-simulated') {
-          this._autoStartOnce = true;
-          this.logger.info('Auto-starting pose detection (data source: ' + ds + ')');
-          this.startDemo();
-        }
+        if (ds !== 'live' && ds !== 'server-simulated') return;
+        // Pose streaming needs the Rust sensing-server REST/WS backend.
+        // Skip quietly when running against the Python sensing-only stack,
+        // otherwise the stream start fails with a burst of console errors.
+        const health = await poseService.healthCheck();
+        if (!health.apiHealthy || this._autoStartOnce) return;
+        this._autoStartOnce = true;
+        this.logger.info('Auto-starting pose detection (data source: ' + ds + ')');
+        this.startDemo();
       };
       setTimeout(tryAutoStart, 2000);
       // Also listen for sensing state changes in case server connects later

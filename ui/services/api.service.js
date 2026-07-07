@@ -99,8 +99,12 @@ export class ApiService {
       return data;
 
     } catch (error) {
-      // Only log if not a connection refusal (expected when DensePose API is down)
-      if (error.message && !error.message.includes('Failed to fetch')) {
+      // Only log unexpected failures. Expected when the DensePose REST API
+      // is down: connection refusal ("Failed to fetch") or HTTP 404 from a
+      // plain static file server (Python sensing-only mode).
+      const msg = error.message || '';
+      const isApiDown = msg.includes('Failed to fetch') || msg.startsWith('HTTP 404');
+      if (!isApiDown) {
         console.error('API Request Error:', error);
       }
       throw error;

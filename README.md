@@ -1,5 +1,19 @@
 # π RuView
 
+> ## Attribution
+>
+> This project builds on [RuView](https://github.com/ruvnet/RuView) (MIT License) by ruvnet,
+> which implements WiFi CSI-based presence/vitals sensing on ESP32-S3 hardware. RuView's
+> firmware and sensing servers are used largely as-is; the additions in this repo are:
+>
+> - **A streamlined laptop dashboard** (`ui/`) — trimmed to Dashboard / Sensing / Live Demo,
+>   with honest data-source labeling (ESP32 CSI vs. laptop WiFi RSSI vs. simulated).
+> - **A one-command GUI launcher** (`scripts/start-gui.py`) that runs the pure-Python sensing
+>   backend + web UI with no Rust or Docker required — see [docs/SETUP-LAPTOP.md](docs/SETUP-LAPTOP.md).
+>
+> The original upstream [LICENSE](LICENSE) (MIT, Copyright (c) 2024 rUv) is preserved at the
+> repo root. The rest of this README is upstream RuView documentation.
+
 <p align="center">
   <a href="https://cognitum.one/seed">
     <img src="assets/ruview-seed.png" alt="RuView - WiFi DensePose" width="100%">

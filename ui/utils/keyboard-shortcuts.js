@@ -15,13 +15,8 @@ export class KeyboardShortcuts {
     this.register('?', 'Show keyboard shortcuts', () => this.toggleHelp());
     this.register('Escape', 'Close overlay / dialog', () => this.closeAll());
     this.register('1', 'Switch to Dashboard tab', () => this.switchTab('dashboard'));
-    this.register('2', 'Switch to Hardware tab', () => this.switchTab('hardware'));
+    this.register('2', 'Switch to Sensing tab', () => this.switchTab('sensing'));
     this.register('3', 'Switch to Live Demo tab', () => this.switchTab('demo'));
-    this.register('4', 'Switch to Architecture tab', () => this.switchTab('architecture'));
-    this.register('5', 'Switch to Performance tab', () => this.switchTab('performance'));
-    this.register('6', 'Switch to Applications tab', () => this.switchTab('applications'));
-    this.register('7', 'Switch to Sensing tab', () => this.switchTab('sensing'));
-    this.register('8', 'Switch to Training tab', () => this.switchTab('training'));
     this.register('p', 'Toggle performance monitor', () => this.togglePerfMonitor());
     this.register('t', 'Toggle dark/light theme', () => this.toggleTheme());
   }

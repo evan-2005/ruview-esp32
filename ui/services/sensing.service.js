@@ -309,7 +309,10 @@ class SensingService {
    */
   _applyServerSource(rawSource) {
     this._serverSource = rawSource;
-    if (rawSource === 'esp32' || rawSource === 'wifi' || rawSource === 'live') {
+    const isPlatformWifi = typeof rawSource === 'string' && rawSource.endsWith('_wifi');
+    if (rawSource === 'esp32' || rawSource === 'wifi' || rawSource === 'live' || isPlatformWifi) {
+      // Platform WiFi (windows_wifi/linux_wifi/macos_wifi) is real measured
+      // RSSI from the host adapter — live data, just coarser than ESP32 CSI.
       this._setDataSource('live');
     } else if (rawSource === 'simulated' || rawSource === 'simulate') {
       this._setDataSource('server-simulated');

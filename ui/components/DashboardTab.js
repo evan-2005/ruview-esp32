@@ -89,10 +89,14 @@ export class DashboardTab {
     const el = this.container.querySelector('#dashboard-datasource');
     if (!el) return;
     const ds = sensingService.dataSource;
+    const raw = sensingService.serverSource;
+    const isEsp32 = raw === 'esp32' || raw === 'wifi' || raw === 'live';
     const statusText = el.querySelector('.status-text');
     const statusMsg  = el.querySelector('.status-message');
     const config = {
-      'live':              { text: 'ESP32',     status: 'healthy', msg: 'Real hardware connected' },
+      'live': isEsp32
+        ? { text: 'ESP32',     status: 'healthy', msg: 'Real hardware connected' }
+        : { text: 'WIFI RSSI', status: 'healthy', msg: 'Live laptop WiFi signal (no ESP32 yet)' },
       'server-simulated':  { text: 'SIMULATED', status: 'warning', msg: 'Server running without hardware' },
       'reconnecting':      { text: 'RECONNECTING', status: 'degraded', msg: 'Attempting to connect...' },
       'simulated':         { text: 'OFFLINE',   status: 'unhealthy', msg: 'Server unreachable, local fallback' },
